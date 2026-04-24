@@ -40,7 +40,7 @@ class RoleSeeder extends Seeder
 
         // Rol Verificado
         $roleVerificado = Role::firstOrCreate(['name' => 'verificado']);
-        $roleVerificado->givePermissionTo(['ver productos']);
+        $roleVerificado->givePermissionTo(['ver productos', 'crear productos', 'editar productos']);
 
         // Rol Administrador: Tiene todos los permisos
         $roleAdmin = Role::firstOrCreate(['name' => 'admin']);

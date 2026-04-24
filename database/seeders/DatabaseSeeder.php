@@ -23,17 +23,30 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
         );
 
-        // 2. Luego buscamos o creamos a tu usuario personal
-        $user = User::firstOrCreate(
+        // 2. Actualizamos o creamos a tu usuario personal (Administrador)
+        $admin = User::updateOrCreate(
             ['email' => 'crishdzcruz99@gmail.com'],
             [
                 'name' => 'Cristian',
                 'password' => Hash::make('Pass0119'),
                 'codigo_postal' => '12345',
+                'avatar' => '1776714964_png', // Opcional: Nombre de tu imagen de avatar
             ]
         );
+        // Le asignamos el rol de administrador a tu cuenta
+        $admin->assignRole('admin');
 
-        // 3. Le asignamos el rol de administrador a tu cuenta
-        $user->assignRole('admin');
+        // 3. Actualizamos o creamos un usuario de prueba para el rol Vendedor
+        $vendedor = User::updateOrCreate(
+            ['email' => 'sreten@oficial.gov.mx'],
+            [
+                'name' => 'Sreten',
+                'password' => Hash::make('Pass0119'),
+                'codigo_postal' => '54321',
+                'avatar' => '1776785365_png', // Opcional: Nombre de tu imagen de avatar
+            ]
+        );
+        // Le asignamos el rol de vendedor
+        $vendedor->assignRole('vendedor');
     }
 }

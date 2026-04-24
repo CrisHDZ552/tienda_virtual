@@ -31,6 +31,35 @@
                 </svg>
             </a>
             @auth
+            <div class="dropdown ms-lg-3 mt-3 mt-lg-0">
+                <button class="btn btn-outline-light position-relative d-flex align-items-center justify-content-center" type="button" id="notificationMenu" data-bs-toggle="dropdown" aria-expanded="false" style="width: 40px; height: 40px; border-radius: 50%;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                    </svg>
+                    @if(auth()->user()->unreadNotifications->count() > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+                            {{ auth()->user()->unreadNotifications->count() }}
+                            <span class="visually-hidden">mensajes no leídos</span>
+                        </span>
+                    @endif
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="notificationMenu" style="min-width: 300px;">
+                    <li class="dropdown-header fw-bold">Notificaciones</li>
+                    @forelse(auth()->user()->unreadNotifications as $notification)
+                        <li>
+                            <a class="dropdown-item text-wrap py-2 border-bottom" href="{{ url('/notificaciones/leer/' . $notification->id) }}">
+                                <div>{{ $notification->data['message'] ?? 'Nueva notificación' }}</div>
+                                <small class="text-muted" style="font-size: 0.75rem;">{{ $notification->created_at->diffForHumans() }}</small>
+                            </a>
+                        </li>
+                    @empty
+                        <li><span class="dropdown-item text-muted py-3 text-center">No tienes notificaciones nuevas.</span></li>
+                    @endforelse
+                    @if(auth()->user()->unreadNotifications->count() > 0)
+                        <li><a class="dropdown-item text-center text-primary py-2" href="{{ url('/notificaciones/marcar-todas') }}">Marcar todas como leídas</a></li>
+                    @endif
+                </ul>
+            </div>
                 <div class="dropdown ms-lg-3 mt-3 mt-lg-0">
                     <a href="#" class="d-flex align-items-center text-decoration-none" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false" role="button">
                         @if(Auth::user()->avatar)
@@ -42,18 +71,20 @@
                         @endif
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="userMenu">
-                        <li><a class="dropdown-item" href="#">Configuración</a></li>
-                        @unlessrole('admin')
-                            @unlessrole('verificado')
-                                <li><a class="dropdown-item" href="{{ url('solicitud_vendedor') }}">Empezar a Vender</a></li>
-                            @endunlessrole
-                        @endunlessrole
+                        <li><a class="dropdown-item" href="{{ url('perfil') }}">Perfil</a></li>
+                        <li><a class="dropdown-item mt-3" href="#">Configuración</a></li>
+                        @role('customer')
+                            <li><a class="dropdown-item mt-3" href="{{ url('solicitud_vendedor') }}">Empezar a Vender</a></li>
+                        @endrole
                         @role('vendedor')
-                            <li><a class="dropdown-item" href="/verificar">Verificarte</a></li>
+                            <li><a class="dropdown-item mt-3" href="/verificar">Verificarte</a></li>
+                        @endrole
+                        @role('admin')
+                            <li><a class="dropdown-item mt-3" href="/verificar_solicitud">Gestionar Verificaciones</a></li>
                         @endrole
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item text-danger" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <a class="dropdown-item text-danger mt-3" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 Cerrar sesión
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
